@@ -3,6 +3,24 @@ import re
 import time
 import asyncio
 from telethon import TelegramClient, events
+from flask import Flask
+import threading
+
+# ---------------- FLASK WEB SERVER (KEEP ALIVE) ---------------- #
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is running"
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
+# ફ્લાસ્ક સર્વરને બેકગ્રાઉન્ડ થ્રેડમાં શરૂ કરી રહ્યા છીએ
+threading.Thread(target=run_web, daemon=True).start()
+
 
 # ---------------- CONFIGURATION ---------------- #
 
@@ -104,7 +122,6 @@ async def download_media_with_progress(message, status_msg, media_type_name):
                 pass
 
     try:
-        # એરર લાવતી 'chunk_size' લાઇન અહીંથી કાઢી નાખી છે
         file_path = await message.download_media(
             file=download_path,
             progress_callback=callback
